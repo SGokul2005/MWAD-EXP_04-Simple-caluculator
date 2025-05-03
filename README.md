@@ -48,50 +48,68 @@ Deploy the website.
 Upload to GitHub Pages for free hosting.
 
 ## PROGRAM
-Calculator.js
+Calculator.jsx
 ```
 import React, { useState } from 'react';
-import './Calculator.css';
 
 const Calculator = () => {
-  const [input, setInput] = useState('');
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
+  const [bmi, setBmi] = useState(null);
+  const [category, setCategory] = useState('');
 
-  const handleClick = (value) => {
-    if (value === '=') {
-      try {
-        setInput(eval(input).toString());
-      } catch {
-        setInput('Error');
-      }
-    } else if (value === 'C') {
-      setInput('');
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const heightInMeters = height / 100;
+    const calculatedBmi = weight / (heightInMeters ** 2);
+    setBmi(calculatedBmi);
+    categorizeBmi(calculatedBmi);
+  };
+
+  const categorizeBmi = (bmi) => {
+    if (bmi < 18.5) {
+      setCategory('Underweight');
+    } else if (bmi < 24.9) {
+      setCategory('Normal weight');
+    } else if (bmi < 29.9) {
+      setCategory('Overweight');
     } else {
-      setInput(input + value);
+      setCategory('Obesity');
     }
   };
 
-  const buttons = [
-    '7', '8', '9', '/',
-    '4', '5', '6', '*',
-    '1', '2', '3', '-',
-    '0', 'C', '=', '+'
-  ];
-
   return (
-    <div className="calculator">
-      <input type="text" value={input} readOnly />
-      <div className="buttons">
-        {buttons.map((btn, index) => (
-          <button key={index} onClick={() => handleClick(btn)}>
-            {btn}
-          </button>
-        ))}
-      </div>
+    <div>
+      <h2>BMI Calculator</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="number"
+          placeholder="Height (in cm)"
+          value={height}
+          onChange={(e) => setHeight(e.target.value)}
+          required
+        />
+        <input
+          type="number"
+          placeholder="Weight (in kg)"
+          value={weight}
+          onChange={(e) => setWeight(e.target.value)}
+          required
+        />
+        <button type="submit">Calculate</button>
+      </form>
+      {bmi !== null && (
+        <div>
+          <h3>Your BMI: {bmi.toFixed(2)}</h3>
+          <p>Category: {category}</p>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Calculator;
+
 ```
 Calculator.css
 ```
@@ -136,21 +154,26 @@ Calculator.css
     background-color: #45a049;
   }
   ```
-App.js
+App.jsx
 ```
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './Home';
 import Calculator from './Calculator';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <h2 style={{ textAlign: 'center' }}>Simple Calculator</h2>
-      <Calculator />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/calculator" element={<Calculator />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
+
 ```
 
 ## OUTPUT
